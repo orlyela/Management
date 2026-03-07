@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת דיווחים חכמה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #22c55e;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e2937;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        header { text-align: center; margin-bottom: 1.5rem; }
+        h2 { margin: 0; color: var(--primary); font-size: 1.6rem; font-weight: 800; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; font-weight: 700; margin-bottom: 0.5rem; font-size: 0.9rem; }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .category-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 16px;
+        }
+
+        .chip {
+            cursor: pointer;
+            padding: 10px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chip input { display: none; }
+
+        .chip:has(input:checked) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+
+        button:hover:not(:disabled) { background-color: var(--primary-hover); }
+        button:disabled { background-color: #cbd5e1; }
+
+        .status-msg {
+            margin-top: 1rem;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            display: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <header>
+        <h2>דיווח נתונים חכם</h2>
+    </header>
+
+    <form id="sheetForm">
+        <div class="form-group">
+            <label for="date">תאריך</label>
+            <input type="date" id="date" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="agentName">שם הנציג/ה</label>
+            <input type="text" id="agentName" list="namesList" placeholder="הקלד לחיפוש..." required>
+            <datalist id="namesList">
+                <option value="מלאק סבאח"> <option value="קתרין בצ'שצ'ה"> <option value="אור שמונוב">
+                <option value="אייל ח'יר"> <option value="אלאן ג׳בארין"> <option value="אמינה אלבאש">
+                <option value="אנגולינה מטר"> <option value="ג׳ואנה קסיס"> <option value="גוהאינה סואעד">
+                <option value="גיווארה רפידי"> <option value="דולב וסטרייך"> <option value="יוסף דאוד">
+                <option value="יזן קזל"> <option value="לארה גזאווי"> <option value="מאיה חדאד">
+                <option value="מהדי זועבי"> <option value="מוחמד שאהין"> <option value="מייס עבד אל רחמאן">
+                <option value="מרואן חוסיסי"> <option value="סאלי גרזוזי"> <option value="עיסא עוייס">
+                <option value="פרלה דיק"> <option value="רודין חדאד"> <option value="רולא דראושה">
+                <option value="רפאל דאמוני"> <option value="רפאל סימנדויב"> <option value="שמואל טטרואשוילי">
+            </datalist>
+        </div>
+
+        <div class="form-group">
+            <label>קטגוריות</label>
+            <div class="category-container">
+                <label class="chip"><input type="checkbox" name="category" value="חיובי">חיובי</label>
+                <label class="chip"><input type="checkbox" name="category" value="משמעת">משמעת</label>
+                <label class="chip"><input type="checkbox" name="category" value="מקצועי">מקצועי</label>
+                <label class="chip"><input type="checkbox" name="category" value="איחור">איחור</label>
+                <label class="chip"><input type="checkbox" name="category" value="חיסור">חיסור</label>
+                <label class="chip"><input type="checkbox" name="category" value="התנהלות">התנהלות</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">תיאור המקרה</label>
+            <textarea id="description" rows="3" placeholder="פרט כאן..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="link">קישור</label>
+            <input type="url" id="link" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label for="statusInput">סטטוס / טיפול</label>
+            <input type="text" id="statusInput" placeholder="מה בוצע?">
+        </div>
+        
+        <button type="submit" id="submitBtn">שלח עדכון</button>
+    </form>
+    <div id="status" class="status-msg"></div>
+</div>
+
+<script>
+    // הקישור החדש שלך יוכנס כאן
+    const scriptURL = 'YOUR_NEW_GOOGLE_SCRIPT_URL_HERE';
+    
+    document.getElementById('date').valueAsDate = new Date();
+
+    const form = document.getElementById('sheetForm');
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('status');
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        btn.disabled = true;
+        btn.innerText = 'שולח...';
+        status.style.display = 'none';
+        
+        const rawDate = document.getElementById('date').value;
+        let formattedDate = "";
+        if (rawDate) {
+            const d = new Date(rawDate);
+            formattedDate = d.getDate() + '/' + (d.getMonth() + 1);
+        }
+
+        const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
+            .map(cb => cb.value).join(', ');
+
+        const data = {
+            date: formattedDate,
+            agentName: document.getElementById('agentName').value,
+            category: selectedCategories,
+            description: document.getElementById('description').value,
+            link: document.getElementById('link').value,
+            status: document.getElementById('statusInput').value
+        };
+
+        try {
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                cache: 'no-cache',
+                body: JSON.stringify(data) 
+            });
+
+            status.style.display = 'block';
+            status.style.color = '#166534';
+            status.style.backgroundColor = '#dcfce7';
+            status.innerText = '✓ נשלח בהצלחה לגיליון!';
+            
+            form.reset();
+            document.getElementById('date').valueAsDate = new Date();
+        } catch (error) {
+            status.style.display = 'block';
+            status.style.color = '#991b1b';
+            status.style.backgroundColor = '#fee2e2';
+            status.innerText = 'שגיאה בשליחה';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'שלח עדכון';
+        }
+    };
+</script>
+
+</body>
+</html>
