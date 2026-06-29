@@ -128,4 +128,117 @@
         </div>
         
         <div class="form-group">
-            <label for="agent
+            <label for="agentName">שם הנציג/ה</label>
+            <input type="text" id="agentName" list="namesList" placeholder="הקלד לחיפוש..." required>
+            <datalist id="namesList">
+                <option value="אור שמונוב"> <option value="אורטל פיטוסי"> <option value="אייל ח'יר">
+                <option value="אלאן ג׳בארין"> <option value="אמינה אלבאש"> <option value="אנגולינה מטר">
+                <option value="אריפנור אוסלו"> <option value="ג׳ואנה קסיס"> <option value="גוהאינה סואעד">
+                <option value="גיווארה רפידי"> <option value="דולב וסטרייך"> <option value="יוסף דאוד">
+                <option value="יזן קזל"> <option value="לארה גזאווי"> <option value="מאי זבידאת">
+                <option value="מאיה חדאד"> <option value="מהדי זועבי"> <option value="מוחמד שאהין">
+                <option value="מייס עבד אל רחמאן"> <option value="מלאק סבאח"> <option value="מרואן חוסיסי">
+                <option value="סאלי גרזוזי"> <option value="סוהיל מוסטפא"> <option value="עיסא עוייס">
+                <option value="פרלה דיק"> <option value="קרלוס סלום"> <option value="קתרין בצ'שצ'ה">
+                <option value="רודין חדאד"> <option value="רולא דראושה"> <option value="רפאל דאמוני">
+                <option value="רפאל סימנדויב"> <option value="שמואל טטרואשוילי"> <option value="תהילה בן חיון">
+            </datalist>
+        </div>
+
+        <div class="form-group">
+            <label>קטגוריות</label>
+            <div class="category-container">
+                <label class="chip"><input type="checkbox" name="category" value="חיובי">חיובי</label>
+                <label class="chip"><input type="checkbox" name="category" value="משמעת">משמעת</label>
+                <label class="chip"><input type="checkbox" name="category" value="מקצועי">מקצועי</label>
+                <label class="chip"><input type="checkbox" name="category" value="איחור">איחור</label>
+                <label class="chip"><input type="checkbox" name="category" value="חוסר">חוסר</label>
+                <label class="chip"><input type="checkbox" name="category" value="התנהלות">התנהלות</label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">תיאור המקרה</label>
+            <textarea id="description" rows="3" placeholder="פרט כאן..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="link">קישור</label>
+            <input type="url" id="link" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label for="statusInput">סטטוס / טיפול</label>
+            <input type="text" id="statusInput" placeholder="מה בוצע?">
+        </div>
+        
+        <button type="submit" id="submitBtn">שלח עדכון</button>
+    </form>
+    <div id="status" class="status-msg"></div>
+</div>
+
+<script>
+    // הקישור החדש שלך יוכנס כאן
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz2cMrxFuQdghae_RVFmLnpUEdwD0BaGc40DZQ448v2gmjvmwxu9azT4H5KMlNhSd56/exec';
+    
+    document.getElementById('date').valueAsDate = new Date();
+
+    const form = document.getElementById('sheetForm');
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('status');
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        btn.disabled = true;
+        btn.innerText = 'שולח...';
+        status.style.display = 'none';
+        
+        const rawDate = document.getElementById('date').value;
+        let formattedDate = "";
+        if (rawDate) {
+            const d = new Date(rawDate);
+            formattedDate = d.getDate() + '/' + (d.getMonth() + 1);
+        }
+
+        const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
+            .map(cb => cb.value).join(', ');
+
+        const data = {
+            date: formattedDate,
+            agentName: document.getElementById('agentName').value,
+            category: selectedCategories,
+            description: document.getElementById('description').value,
+            link: document.getElementById('link').value,
+            status: document.getElementById('statusInput').value
+        };
+
+        try {
+            await fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                cache: 'no-cache',
+                body: JSON.stringify(data) 
+            });
+
+            status.style.display = 'block';
+            status.style.color = '#166534';
+            status.style.backgroundColor = '#dcfce7';
+            status.innerText = '✓ נשלח בהצלחה לגיליון!';
+            
+            form.reset();
+            document.getElementById('date').valueAsDate = new Date();
+        } catch (error) {
+            status.style.display = 'block';
+            status.style.color = '#991b1b';
+            status.style.backgroundColor = '#fee2e2';
+            status.innerText = 'שגיאה בשליחה';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'שלח עדכון';
+        }
+    };
+</script>
+
+</body>
+</html>
